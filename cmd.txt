@@ -1,0 +1,4 @@
+nasm -f bin example.asm -o example.bin
+qemu-system-x86_64 -fda example.bin
+
+.\buildSingleASM.bat example
