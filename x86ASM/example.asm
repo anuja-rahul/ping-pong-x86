@@ -1,11 +1,25 @@
 ORG 0x7C00
 
+Colors.Black equ 0x0          ;Black
+Colors.Blue equ 0x1           ;Blue
+Colors.Green equ 0x2          ;Green
+Colors.Cyan equ 0x3           ;Cyan
+Colors.Red equ 0x4            ;Red
+Colors.Magenta equ 0x5        ;Magenta
+Colors.Brown equ 0x6          ;Brown
+Colors.LightGrey equ 0x7      ;LightGrey
+Colors.Grey equ 0x8           ;Grey
+Colors.LightBlue equ 0x9      ;LightBlue
+Colors.LightGreen equ 0xA     ;LightGreen
+Colors.LightCyan equ 0xB      ;LightCyan
+Colors.LightRed equ 0xC       ;LightRed
+Colors.LightMagenta equ 0xD   ;LightMagenta
+Colors.Yellow equ 0xE         ;Yellow
+Colors.White equ 0xF          ;White
+
 PIT_COMMAND equ 0x43
-
 PIT_CHANNEL_0 equ 0x40
-
 PIT_FREQUENCY equ 1193180
-
 DESIRED_FREQ equ 60
 
 DIVISOR equ PIT_FREQUENCY / DESIRED_FREQ
@@ -20,18 +34,19 @@ start:
     mov al, 0x13 ; 320x200 256 color mode
     int 0x10
 
-    mov edi, (DRAW_START + 5000)
     call Timer_Setup
 
     jmp $
 
 
-draw_pixel:
-    mov byte [edi], COLOR_RED
+fill_pixel:
+    mov byte [edi], Colors.LightRed
     inc edi
     ret
 
 draw_box:
+
+
     mov edi, DRAW_START
     mov eax, [sq_y]
     mov ebx, 320
@@ -50,7 +65,11 @@ draw_box:
 
 
 .put_pixel:
-    mov byte [edi], COLOR_RED
+
+    push eax
+    mov al, [colorDraw]
+    mov byte [edi], al
+    pop eax
     inc edi
     inc ecx
     cmp ecx, [sq_width]
@@ -64,7 +83,21 @@ draw_box:
     ret
 
 Timer_Event:
-    call draw_pixel
+
+    mov al, Colors.Black
+    mov [colorDraw], al
+
+    call draw_box
+
+    mov eax, [sq_x]
+    inc eax
+    mov [sq_x], eax
+
+    mov al, Colors.Green
+    mov [colorDraw], al
+
+    call draw_box
+
     ret
 
 timer_interrupt:
@@ -92,7 +125,9 @@ Timer_Setup:
 
 begin_draw dd 0
 
-sq_x dd 100
+colorDraw db 0
+
+sq_x dd 10
 
 sq_y dd 50
 
@@ -101,8 +136,6 @@ sq_width dd 40
 sq_height dd 70
 
 DRAW_START equ 0xA0000 ; VGA memory
-
-COLOR_RED equ 0x04
 
 times 510-($-$$) db 0
 
