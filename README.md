@@ -73,12 +73,13 @@ qemu-system-x86_64 -fda example.bin
 
 ### Description
 
-This assembly file contains code to set the video mode to 320x200 with 256 colors and draw a red square on the screen.
+This assembly file contains code to set the video mode to 320x200 with 256 colors and draw a moving square on the screen.
 
 ### Functionality
 
 - **Initialization**: Sets up the data segment, stack segment, and video mode.
 - **Drawing the Square**: Calculates the starting position and dimensions of the square, then draws it pixel by pixel.
+- **Timer Interrupt**: Moves the square horizontally across the screen.
 - **Infinite Loop**: Keeps the program running indefinitely.
 
 </details>
