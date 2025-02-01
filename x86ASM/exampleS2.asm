@@ -158,6 +158,18 @@ move_box_up:
     mov [left_y_paddle], eax
     ret
 
+move_right_box_down:
+    mov eax, [right_y_paddle]
+    add eax, 3
+    mov [right_y_paddle], eax
+    ret
+
+move_right_box_up:
+    mov eax, [right_y_paddle]
+    sub eax, 3
+    mov [right_y_paddle], eax
+    ret
+
 ; write_char:
 ;     mov ah, 0x0E
 ;     mov bl, Colors.LightBlue
@@ -215,8 +227,16 @@ Timer_Event:
     call move_box_down
 .check:
     cmp byte [w_down], 'w'
-    jne .skip
+    jne .skip_next
     call move_box_up
+.skip_next:
+    cmp byte [i_down], 'i'
+    jne .check_right
+    call move_right_box_up ; possibly fked up
+.check_right:
+    cmp byte [k_down], 'k'
+    jne .skip
+    call move_right_box_down ; possibly fked up again !
 
 .skip:
     mov al, Colors.Black
@@ -251,7 +271,8 @@ Timer_Event:
 
     mov eax, 290
     mov [sq_x], eax
-    mov eax, [left_y_paddle]
+    mov eax, [right_y_paddle]
+    mov [sq_y], eax
 
     call draw_box
     ret
@@ -308,6 +329,7 @@ sq_height dd 70
 ;; user drawing
 
 left_y_paddle dd 60
+right_y_paddle dd 60
 
 ;;;;;;;;;;;;;;;
 
