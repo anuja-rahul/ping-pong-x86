@@ -31,13 +31,52 @@ start:
     mov ss, ax
     mov sp, 0x7C00
 
-    mov al, 0x13 ; 320x200 256 color mode
-    int 0x10
+    ; mov al, 0x13 ; 320x200 256 color mode
+    ; int 0x10
 
-    call Timer_Setup
+    ; call Timer_Setup
+    call SetupKeyboardInterrupt
 
     jmp $
 
+SetupKeyboardInterrupt:
+    cli
+    xor ax, ax
+    mov es, ax
+    mov word [es:0x0024], keyboard_handler
+    mov [es:0x0026], cs
+    sti
+    ret
+
+keyboard_handler:
+    in al, 0x60
+    test al, 0x80
+    jz .Key_Down
+
+    ; key up
+    call Key_Up
+
+    jmp .done
+
+
+.Key_Down:
+    call Key_Down
+.done:
+    mov al, 0x20
+    out 0x20, al
+    iret
+
+Key_Up:
+    ret
+
+Key_Down:
+    call write_char
+    ret
+
+write_char:
+    mov ah, 0x0E
+    int 0x10
+    ret
 
 fill_pixel:
     mov byte [edi], Colors.LightRed
