@@ -73,7 +73,7 @@ Key_Up:
     ret
 
 Key_Down:
-    call write_char
+    ; call write_char
 
     cmp byte [keyval], 's'
     je .s_press
@@ -88,19 +88,15 @@ Key_Down:
     ret
 
 move_box_down:
-    push eax
-    mov eax, [sq_y]
+    mov eax, [left_y_paddle]
     add eax, 3
-    mov [sq_y], eax
-    pop eax
+    mov [left_y_paddle], eax
     ret
 
 move_box_up:
-    push eax
-    mov eax, [sq_y]
+    mov eax, [left_y_paddle]
     sub eax, 3
-    mov [sq_y], eax
-    pop eax
+    mov [left_y_paddle], eax
     ret
 
 write_char:
@@ -123,8 +119,7 @@ draw_box:
     add eax, edi
     mov edi, eax
     add edi, [sq_x]
-
-
+    xor ecx, ecx
     jmp .put_pixel
 
 .move_down:
@@ -134,11 +129,11 @@ draw_box:
 
 
 .put_pixel:
-
-    push eax
     mov al, [colorDraw]
+    cmp edi, DRAW_START
+    jl .continue
     mov byte [edi], al
-    pop eax
+.continue:
     inc edi
     inc ecx
     cmp ecx, [sq_width]
@@ -156,14 +151,30 @@ Timer_Event:
     mov al, Colors.Black
     mov [colorDraw], al
 
-    call draw_box
-
-    mov eax, [sq_x]
-    inc eax
+    mov eax, 0
     mov [sq_x], eax
+    mov eax, 0
+    mov [sq_y], eax
+
+    mov eax, SCREEN_WIDTH
+    mov [sq_width], eax
+    mov eax, SCREEN_HEIGHT
+    mov [sq_height], eax
+
+    call draw_box
 
     mov al, Colors.Green
     mov [colorDraw], al
+
+    mov eax, 20
+    mov [sq_x], eax
+    mov eax, [left_y_paddle]
+    mov [sq_y], eax
+
+    mov eax, 10
+    mov [sq_width], eax
+    mov eax, 80
+    mov [sq_height], eax
 
     call draw_box
 
@@ -212,7 +223,17 @@ sq_width dd 40
 
 sq_height dd 70
 
+;; user drawing
+
+left_y_paddle dd 60
+
+;;;;;;;;;;;;;;;
+
 DRAW_START equ 0xA0000 ; VGA memory
+
+SCREEN_HEIGHT equ 200
+
+SCREEN_WIDTH equ 320
 
 times 510-($-$$) db 0
 
