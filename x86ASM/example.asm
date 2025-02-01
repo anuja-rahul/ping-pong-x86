@@ -31,19 +31,17 @@ start:
     mov ss, ax
     mov sp, 0x7C00
 
-    ; mov al, 0x13 ; 320x200 256 color mode
-    ; int 0x10
+    mov al, 0x13 ; 320x200 256 color mode
+    int 0x10
 
-    ; call Timer_Setup
+    call Timer_Setup
     call SetupKeyboardInterrupt
 
     jmp $
 
 SetupKeyboardInterrupt:
     cli
-    xor ax, ax
-    mov es, ax
-    mov word [es:0x0024], keyboard_handler
+    mov word [0x0024], keyboard_handler
     mov [es:0x0026], cs
     sti
     ret
@@ -71,6 +69,15 @@ Key_Up:
 
 Key_Down:
     call write_char
+    call move_box_down
+    ret
+
+move_box_down:
+    push eax
+    mov eax, [sq_y]
+    sub eax, 3
+    mov [sq_y], eax
+    pop eax
     ret
 
 write_char:
