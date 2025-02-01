@@ -239,20 +239,7 @@ Timer_Event:
     call move_right_box_down ; possibly fked up again !
 
 .skip:
-    mov al, Colors.Black
-    mov [colorDraw], al
-
-    mov eax, 0
-    mov [sq_x], eax
-    mov eax, 0
-    mov [sq_y], eax
-
-    mov eax, SCREEN_WIDTH
-    mov [sq_width], eax
-    mov eax, SCREEN_HEIGHT
-    mov [sq_height], eax
-
-    call draw_box
+    call clear_screen
 
     mov al, Colors.Green
     mov [colorDraw], al
@@ -273,6 +260,41 @@ Timer_Event:
     mov [sq_x], eax
     mov eax, [right_y_paddle]
     mov [sq_y], eax
+
+    call draw_box
+    call draw_ball
+    ret
+
+clear_screen:
+    mov al, Colors.Black
+    mov [colorDraw], al
+
+    mov eax, 0
+    mov [sq_x], eax
+    mov eax, 0
+    mov [sq_y], eax
+
+    mov eax, SCREEN_WIDTH
+    mov [sq_width], eax
+    mov eax, SCREEN_HEIGHT
+    mov [sq_height], eax
+
+    call draw_box
+    ret
+
+draw_ball:
+    mov al, Colors.Green
+    mov [colorDraw], al
+
+    mov eax, [ball_x]
+    mov [sq_x], eax
+    mov eax, [ball_y]
+    mov [sq_y], eax
+
+    mov eax, 10
+    mov [sq_width], eax
+    mov eax, 10
+    mov [sq_height], eax
 
     call draw_box
     ret
@@ -330,6 +352,9 @@ sq_height dd 70
 
 left_y_paddle dd 60
 right_y_paddle dd 60
+
+ball_x dd 160
+ball_y dd 90
 
 ;;;;;;;;;;;;;;;
 
