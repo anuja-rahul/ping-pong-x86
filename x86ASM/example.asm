@@ -58,6 +58,11 @@ keyboard_handler:
 
 
 .Key_Down:
+    and al, 0x7F
+    xor bx, bx
+    mov bl, al
+    mov al, [scan_code_table + bx]
+    mov [keyval], al
     call Key_Down
 .done:
     mov al, 0x20
@@ -69,10 +74,28 @@ Key_Up:
 
 Key_Down:
     call write_char
+
+    cmp byte [keyval], 's'
+    je .s_press
+
+.w_press:
+    call move_box_up
+    jmp .done
+.s_press:
     call move_box_down
+    jmp .done
+.done:
     ret
 
 move_box_down:
+    push eax
+    mov eax, [sq_y]
+    add eax, 3
+    mov [sq_y], eax
+    pop eax
+    ret
+
+move_box_up:
     push eax
     mov eax, [sq_y]
     sub eax, 3
@@ -82,6 +105,7 @@ move_box_down:
 
 write_char:
     mov ah, 0x0E
+    mov bl, Colors.LightBlue
     int 0x10
     ret
 
@@ -91,7 +115,6 @@ fill_pixel:
     ret
 
 draw_box:
-
 
     mov edi, DRAW_START
     mov eax, [sq_y]
@@ -168,8 +191,16 @@ Timer_Setup:
     sti
     ret
 
+scan_code_table:
+    db 0, 0, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 0, 0
+    db 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', 0, 0
+    db 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", '`', 0, '\'
+    db 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' '
+
 
 begin_draw dd 0
+
+keyval db 0
 
 colorDraw db 0
 
