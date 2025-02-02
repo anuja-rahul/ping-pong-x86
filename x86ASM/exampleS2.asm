@@ -147,27 +147,39 @@ Key_Down:
     ret
 
 move_box_down:
+    cmp dword [left_y_paddle], 120
+    jge .done
     mov eax, [left_y_paddle]
     add eax, 3
     mov [left_y_paddle], eax
+.done:
     ret
 
 move_box_up:
+    cmp dword [left_y_paddle], 0
+    jle .done
     mov eax, [left_y_paddle]
     sub eax, 3
     mov [left_y_paddle], eax
+.done:
     ret
 
 move_right_box_down:
+    cmp dword [right_y_paddle], 120
+    jge .done
     mov eax, [right_y_paddle]
     add eax, 3
     mov [right_y_paddle], eax
+.done:
     ret
 
 move_right_box_up:
+    cmp dword [right_y_paddle], 0
+    jle .done
     mov eax, [right_y_paddle]
     sub eax, 3
     mov [right_y_paddle], eax
+.done:
     ret
 
 ; write_char:
@@ -223,6 +235,7 @@ draw_box:
 Timer_Event:
 
     call ball_move_x
+    call ball_move_y
 
     cmp byte [s_down], 's'
     jne .check
@@ -306,6 +319,26 @@ draw_ball:
     call draw_box
     ret
 
+reset_ball:
+    mov dword [ball_x], 160
+    mov dword [ball_y], 90
+
+    ret
+
+switch_direct_to_zero:
+    mov al, 1
+    mov [ball_direction], al
+
+    ret
+
+switch_direct_to_one:
+    mov al, 0
+    mov [ball_direction], al
+
+    ret
+
+
+
 ball_move_x:
 
     cmp dword [ball_x], 310
@@ -315,13 +348,15 @@ ball_move_x:
     jmp .update_pos
 
 .switch_dir_zero:
-    mov eax, 1
-    mov [ball_direction], eax
+    call reset_ball
+    ; mov al, 1
+    ; mov [ball_direction], al
     jmp .update_pos
 
 .switch_dir_one:
-    mov eax, 0
-    mov [ball_direction], eax
+    call reset_ball
+    ; mov al, 0
+    ; mov [ball_direction], al
 
 .update_pos:
     mov eax, [ball_x]
@@ -336,6 +371,38 @@ ball_move_x:
     mov [ball_x], eax
 .done:
     ret
+
+ball_move_y:
+
+    cmp dword [ball_y], 190
+    jge .switch_dir_zero
+    cmp dword [ball_y], 0
+    jle .switch_dir_one
+    jmp .update_pos
+
+.switch_dir_zero:
+    mov al, 1
+    mov [ball_updown], al
+    jmp .update_pos
+
+.switch_dir_one:
+    mov al, 0
+    mov [ball_updown], al
+
+.update_pos:
+    mov eax, [ball_y]
+    mov ebx, 2
+    cmp byte [ball_updown], 0
+    je .add
+    sub eax, ebx
+    mov [ball_y], eax
+    jmp .done
+.add:
+    add eax, ebx
+    mov [ball_y], eax
+.done:
+    ret
+
 
 timer_interrupt:
     call Timer_Event
@@ -394,6 +461,8 @@ right_y_paddle dd 60
 ball_x dd 160
 ball_y dd 90
 ball_direction db 0
+spacer dd 0
+
 ball_updown db 0
 
 ;;;;;;;;;;;;;;;
