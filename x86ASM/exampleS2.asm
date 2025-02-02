@@ -258,6 +258,8 @@ Timer_Event:
 
     call draw_paddles
     call draw_ball
+    call is_right_paddle_collision
+    call is_left_paddle_collision
     ret
 
 draw_paddles:
@@ -326,18 +328,60 @@ reset_ball:
     ret
 
 switch_direct_to_zero:
-    mov al, 1
-    mov [ball_direction], al
-
-    ret
-
-switch_direct_to_one:
     mov al, 0
     mov [ball_direction], al
 
     ret
 
+switch_direct_to_one:
+    mov al, 1
+    mov [ball_direction], al
 
+    ret
+
+is_left_paddle_collision:
+    cmp dword [ball_x], 30
+    jg .done
+
+    call check_left_paddle
+.done:
+    ret
+
+is_right_paddle_collision:
+    cmp dword [ball_x], 280
+    jl .done
+
+    call check_right_paddle
+.done:
+    ret
+
+check_left_paddle:
+    mov eax, [left_y_paddle]
+    cmp eax, [ball_y]
+    jg .done
+
+    add eax, 80
+
+    cmp eax, [ball_y]
+    jl .done
+
+    call switch_direct_to_zero
+.done:
+    ret
+
+check_right_paddle:
+    mov eax, [right_y_paddle]
+    cmp eax, [ball_y]
+    jg .done
+
+    add eax, 80
+
+    cmp eax, [ball_y]
+    jl .done
+
+    call switch_direct_to_one
+.done:
+    ret
 
 ball_move_x:
 
