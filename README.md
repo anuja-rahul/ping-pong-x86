@@ -1,6 +1,6 @@
-# Ping Pong NASM x86 🏓
+# Ping Pong Game x86 Assembly 🏓
 
-This project contains assembly code for a simple program written in NASM (Netwide Assembler). The program is designed to run in a 16-bit real mode environment and demonstrates basic graphics programming by drawing a square on the screen.
+This project contains assembly code for a simple ping pong game written in NASM (Netwide Assembler). The program is designed to run in a 16-bit real mode environment and demonstrates basic graphics programming by drawing paddles and a ball on the screen, handling keyboard input, and implementing game logic.
 
 ## Table of Contents
 
